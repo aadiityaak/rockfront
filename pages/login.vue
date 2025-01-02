@@ -22,10 +22,6 @@
       <div>
         <Button label="Login" type="submit" ><Icon name="lucide:log-in"/> Login</Button>
       </div>
-      <div class="flex justify-between">
-        <NuxtLink to="/register" class="text-sm text-zinc-900 dark:text-zinc-300">Belum punya akun? Daftar</NuxtLink>
-        <NuxtLink to="/forgot-password" class="text-sm text-zinc-900 dark:text-zinc-300">Lupa Password?</NuxtLink>
-      </div>
   </form>
 </template>
 
