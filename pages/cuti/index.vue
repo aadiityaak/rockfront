@@ -8,7 +8,7 @@
   const client = useSanctumClient()
   const { data, error, refresh } = await useAsyncData('paket', fetchData)
   function fetchData() {
-    return client(`/api/paket`);
+    return client(`/api/cuti`);
   }
 </script>
 
