@@ -7,7 +7,7 @@
   <Message severity="error" class="mb-4 max-w-[400px] w-full mx-auto" v-if="loginError">
     {{ loginError }}
   </Message>
-  <form @submit.prevent="handleLogin" ref="form" class="max-w-[400px] w-full mx-auto rounded-lg border 
+  <form @submit.prevent="handleLogin" ref="form" class="max-w-[400px] mx-auto rounded-lg border 
   border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 p-4
   flex justify-center flex-col gap-4 w-full" >
       <h1 class="text-2xl font-bold">Login</h1>
