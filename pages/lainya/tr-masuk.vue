@@ -8,7 +8,7 @@
   const client = useSanctumClient()
   const { data, error, refresh } = await useAsyncData('tr-masuk', fetchData)
   function fetchData() {
-    return client(`/api/transaksi-masuk`);
+    return client(`/api/tr-masuk`);
   }
 </script>
 
