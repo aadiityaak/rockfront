@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
   const client = useSanctumClient()
-  const { data, error, refresh } = await useAsyncData('paket', fetchData)
+  const { data, error, refresh } = await useAsyncData('wmproject', fetchData)
   function fetchData() {
     return client(`/api/wmproject`);
   }
