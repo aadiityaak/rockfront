@@ -6,13 +6,13 @@
       </Button>
     </div>
   </SubHeader>
-  <DataTable :value="data" striped-rows tableStyle="min-width: 50rem">
+  <DataTable v-if="data" :value="data.data" striped-rows tableStyle="min-width: 50rem">
       <Column field="id_paket" header="ID"></Column>
       <Column field="paket" header="Paket"></Column>
       <Column field="bobot" header="Bobot"></Column>
-      <Column header="Tindakan">
+      <Column header="">
           <template #body="slotProps" >
-            <div class="flex justify-center gap-1">
+            <div class="flex justify-end gap-1">
               <Button severity="success" size="small" @click="modalPaket(slotProps.data)">
                   <Icon name="lucide:edit" size="1em" />
               </Button>
@@ -23,6 +23,24 @@
           </template>
       </Column>
   </DataTable>
+  <Paginator
+    v-if="data.total > data.per_page"
+    :rows="data.per_page"
+    :totalRecords="data.total"
+    @page="onPageChange"
+    aria-label="page"
+    :pt="{
+      root: (event) => {
+        const itemForPage = data.per_page;
+        const currentPage = page - 1;
+        event.state.d_first = itemForPage * currentPage;
+      },
+    }"
+  >
+    <template #start="slotProps">
+      Halaman {{ slotProps.state.page + 1 }} dari {{ Math.ceil(data.total / data.per_page) }}
+    </template>
+  </Paginator>
   <ConfirmPopup>
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div class="rounded p-4">
@@ -35,24 +53,25 @@
     </template>
   </ConfirmPopup>
   <Toast />
-  <DynamicDialog />
-  <div>
-    <div class="text-red-500">{{ data }}</div>
-  </div>  
+  <DynamicDialog/>
 </template>
 
 <script lang="ts" setup>
   definePageMeta({
       title: "Paket",
   });
+  const route = useRoute()
   const client = useSanctumClient()
   const confirm = useConfirm()
   const toast = useToast()
   const dialog = useDialog()
+  const page = ref(route.query.page ? Number(route.query.page) : 1) as any
   const ModalPaket = defineAsyncComponent(() => import('~/components/ModalPaket.vue'))
   const { data, error, refresh } = await useAsyncData('paket', fetchData)
   function fetchData() {
-    return client(`/api/paket`);
+    const query = new URLSearchParams();
+    const response = client(`/api/paket?page=${page.value}&${query.toString()}`);
+    return response
   }
 
   const deletePaket = async (paket: any) => {
@@ -77,6 +96,10 @@
       },
     })
   }
+  const onPageChange = (event: { page: number, first: number, rows: number, pageCount: number }) => {
+    page.value = event.page + 1; 
+    navigateTo(`/paket?page=${page.value}`);
+  }
   const modalPaket = (data: any) => {
     dialog.open(ModalPaket, {
       data: data,
@@ -88,14 +111,13 @@
         class: 'w-full max-w-[500px]',
         modal: true
       } as any,
-      emits: {
-        refreshData: () => {
-          console.log('enit refresh');
-          refresh()
-          toast.add({ severity: 'success', summary: 'Success', detail: 'Paket berhasil disimpan!', life: 3000 })
-        }
+      onClose: () => {
+        refresh()
       }
-    });
+    })
   }
+  watch(page, (newPage) => {
+    refresh()
+  });
 </script>
 
