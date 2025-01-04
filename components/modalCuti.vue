@@ -11,7 +11,7 @@
         </IftaLabel>
 
         <IftaLabel>
-            <Select v-model="params.jenis" :options="jeniscuti" optionLabel="jenis" placeholder="Jenis Cuti" checkmark :highlightOnSelect="false" class="w-full md:w-56" />
+            <Select v-model="params.jenis" :options="jeniscuti" optionLabel="name" optionValue="code" placeholder="Jenis Cuti" checkmark :highlightOnSelect="false" class="w-full md:w-56" />
             <label for="jenis">Jenis Cuti</label>
         </IftaLabel>
         
@@ -26,7 +26,7 @@
     const params = ref({} as any)
     const dialogRef = inject('dialogRef') as any
     const emit = defineEmits(['refreshData']);
-    
+
     const jeniscuti = [
         { name: 'Full', code: 'Full' },
         { name: 'Jam', code: 'Jam' },
