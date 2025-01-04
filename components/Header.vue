@@ -84,6 +84,11 @@ const items = ref([
                 label: 'Domain',
                 href:'/lainya/domain',
             },
+            {
+                key: 'cuti',
+                label: 'Data Cuti',
+                href:'/cuti',
+            },
         ]
     },
 ]);
