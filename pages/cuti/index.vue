@@ -10,7 +10,11 @@
   <DataTable :value="data" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" striped-rows tableStyle="min-width: 50rem">
       <Column field="id" header="ID"></Column>
       <Column field="nama" header="Nama"></Column>
-      <Column field="tanggal" header="Tanggal"></Column>
+      <Column field="tanggal" header="Tanggal">
+          <template #body="slotProps">
+             {{ FormatTanggal(slotProps.data.tanggal) }}
+          </template>
+      </Column>
       <Column field="jenis" header="Jenis"></Column>
       <Column field="detail" header="Detail"></Column>
       <Column header="Tindakan">
@@ -58,7 +62,12 @@
   function fetchData() {
     return client(`/api/cuti`);
   }
+  const FormatTanggal = (tanggal: any) => {
+    const date = new Date(tanggal);
+    //longdate
+    return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
+  }
   const deleteCuti = async (cuti: any) => {
     confirm.require({
       message: 'Apakah Anda yakin ingin menghapus data cuti ini?',
