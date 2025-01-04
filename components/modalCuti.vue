@@ -11,8 +11,23 @@
         </IftaLabel>
 
         <IftaLabel>
-            <Select v-model="params.jenis" :options="jeniscuti" optionLabel="name" optionValue="code" placeholder="Jenis Cuti" checkmark :highlightOnSelect="false" class="w-full md:w-56" />
+            <Select v-model="params.jenis" :options="jeniscuti" optionLabel="jenis" optionValue="value" placeholder="Pilih Jenis Cuti" checkmark :highlightOnSelect="false" class="w-full md:w-56" fluid />
             <label for="jenis">Jenis Cuti</label>
+        </IftaLabel>
+
+        <IftaLabel>
+            <DatePicker id="time" v-model="params.time" class="w-full" dateFormat="H:s" timeOnly variant="filled" />
+            <label for="time">Waktu Cuti</label>
+        </IftaLabel>
+
+        <IftaLabel>
+            <Select id="tipe" v-model="params.tipe" :options="tipecuti" optionLabel="tipe" optionValue="value" placeholder="Pilih Tipe Cuti" checkmark :highlightOnSelect="false" class="w-full md:w-56" fluid />
+            <label for="tipe">Tipe Cuti</label>
+        </IftaLabel>
+
+        <IftaLabel>
+            <InputText id="detail" v-model="params.detail" class="w-full" type="text" variant="filled"/>
+            <label for="detail">Detail</label>
         </IftaLabel>
         
         <div>
@@ -28,8 +43,14 @@
     const emit = defineEmits(['refreshData']);
 
     const jeniscuti = [
-        { name: 'Full', code: 'Full' },
-        { name: 'Jam', code: 'Jam' },
+        { jenis: 'Full', value: 'Full' },
+        { jenis: 'Jam', value: 'Jam' },
+    ];
+
+    const tipecuti = [
+        { tipe: 'Belum diganti', value: 'Belum diganti' },
+        { tipe: 'Sudah diganti', value: 'Sudah diganti' },
+        { tipe: 'Sakit', value: 'Sakit' },
     ];
 
     onMounted(() => {

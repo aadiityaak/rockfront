@@ -7,7 +7,7 @@
     </div>
   </SubHeader>
 
-  <DataTable :value="data" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" striped-rows tableStyle="min-width: 50rem">
+  <DataTable v-if="data" :value="data.data" striped-rows tableStyle="min-width: 50rem">
       <Column field="id" header="ID"></Column>
       <Column field="nama" header="Nama"></Column>
       <Column field="tanggal" header="Tanggal">
@@ -16,6 +16,12 @@
           </template>
       </Column>
       <Column field="jenis" header="Jenis"></Column>
+      <Column field="time" header="Waktu">
+          <template #body="slotProps">
+             {{ FormatWaktu(slotProps.data.time) }}
+          </template>
+      </Column>
+      <Column field="tipe" header="Tipe"></Column>
       <Column field="detail" header="Detail"></Column>
       <Column header="Tindakan">
           <template #body="slotProps" >
@@ -30,6 +36,26 @@
           </template>
       </Column>
   </DataTable>
+
+  <Paginator
+    v-if="data.total > data.per_page"
+    :rows="data.per_page"
+    :totalRecords="data.total"
+    @page="onPageChange"
+    aria-label="page"
+    :pt="{
+      root: (event) => {
+        const itemForPage = data.per_page;
+        const currentPage = page - 1;
+        event.state.d_first = itemForPage * currentPage;
+      },
+    }"
+  >
+    <template #start="slotProps">
+      Menampilkan {{ data.from}} sampai {{ data.to}} dari {{ data.total }}
+    </template>
+  </Paginator>
+
   <ConfirmPopup>
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div class="rounded p-4">
@@ -43,31 +69,50 @@
   </ConfirmPopup>
   <Toast />
   <DynamicDialog />
-  <div>
-    <div class="text-red-500">{{ data }}</div>
-  </div>
 </template>
 
 <script lang="ts" setup>
   definePageMeta({
       title: "Cuti",
   });
+  const route = useRoute()
   const client = useSanctumClient()
   const confirm = useConfirm()
   const toast = useToast()
   const dialog = useDialog()
+  const page = ref(route.query.page ? Number(route.query.page) : 1) as any
   const ModalCuti = defineAsyncComponent(() => import('~/components/ModalCuti.vue'))
   const { data, error, refresh } = await useAsyncData('cuti', fetchData)
 
   function fetchData() {
-    return client(`/api/cuti`);
+    const query = new URLSearchParams();
+    const response = client(`/api/cuti?page=${page.value}&${query.toString()}`);
+    return response;
   }
+
   const FormatTanggal = (tanggal: any) => {
     const date = new Date(tanggal);
     //longdate
     return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-
   }
+
+  const FormatWaktu = (time) => {
+    if (typeof time === "string") {
+      if (time.includes("T")) {
+        // Jika input dalam format ISO 8601
+        const date = new Date(time); // Konversi ke objek Date
+        return date.toLocaleTimeString("id-ID", { hour: "numeric", minute: "numeric" });
+      } else if (time.includes(":")) {
+        // Jika input dalam format "HH:mm"
+        const [hour, minute] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hour, minute, 0, 0); // Set jam dan menit
+        return date.toLocaleTimeString("id-ID", { hour: "numeric", minute: "numeric" });
+      }
+    }
+    return null; // Jika format tidak valid
+  }
+  
   const deleteCuti = async (cuti: any) => {
     confirm.require({
       message: 'Apakah Anda yakin ingin menghapus data cuti ini?',
@@ -90,6 +135,12 @@
       },
     })
   }
+
+  const onPageChange = (event: {page: number, first: number, rows: number, pageCount: number}) => {
+    page.value = event.page + 1;
+    navigateTo(`/cuti?page=${page.value}`);
+  }
+
   const modalCuti = (data: any) => {
     dialog.open(ModalCuti, {
       data: data,
@@ -101,14 +152,13 @@
         class: 'w-full max-w-[500px]',
         modal: true
       } as any,
-      emits: {
-        refreshData: () => {
-          console.log('enit refresh');
-          refresh()
-          toast.add({ severity: 'success', summary: 'Success', detail: 'Data Cuti berhasil disimpan!', life: 3000 })
-        }
+      onClose: () => {
+        refresh()
       }
-    });
+    })
   }
+  watch(page, (newPage) => {
+    refresh()
+  });
 </script>
 

@@ -38,7 +38,7 @@
     }"
   >
     <template #start="slotProps">
-      Halaman {{ slotProps.state.page + 1 }} dari {{ Math.ceil(data.total / data.per_page) }}
+       Menampilkan {{ data.from}} sampai {{ data.to}} dari {{ data.total }}
     </template>
   </Paginator>
   <ConfirmPopup>
